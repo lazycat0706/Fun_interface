@@ -10,25 +10,27 @@ def check_save(loc_num, api_name, expect_result, response):
 
 
 def run_interface(env, qsxq_type):
+    token = ""
+    if qsxq_type == "comm" or qsxq_type == "erp":
+        token = get_login_token(qsxq_type)
     loc_num = 2
     base_url = get_env_url(env, qsxq_type)
     for interface_info in data_list:
         api_name = interface_info[0]
         url = base_url + interface_info[2].strip()
-        headers = get_header(qsxq_type)
-        header = interface_info[3]
+        headers = get_headers(qsxq_type, token)
+        someting = interface_info[3]
         post_data = str(interface_info[4])
         method = interface_info[1]
         title = interface_info[7]
         expect_result = json.loads(interface_info[5])
         print(title + '-' + method + '请求参数: ' + post_data)
-        if header == 'skip':
+        if someting == 'skip':
             print('跳过执行')
             loc_num += 1
             continue
-        elif header == "normal":
+        elif someting == "normal":
             post_data = json.loads(post_data)
-            print(title + '-' + method + '请求参数: ' + post_data)
             response = json.loads(send_post_json_request(url, headers, post_data))
             check_save(loc_num, api_name, expect_result, response)
             loc_num += 1
@@ -37,7 +39,6 @@ def run_interface(env, qsxq_type):
                 post_data = json.loads(post_data)
             else:
                 post_data = ""
-            # print(title + '-' + method + '请求参数: ' + post_data)
             if method == "get":
                 response = json.loads(send_get_request(url, headers, post_data))
                 check_save(loc_num, api_name, expect_result, response)
@@ -49,15 +50,12 @@ def run_interface(env, qsxq_type):
 
 
 if __name__ == '__main__':
-    # case_path = ""
     qsxq_type = "erp"
     env = "sit"
     case_path_dict = {
         "app": "D:/Python development/Fun_Interface/app_interface.xlsx",
         "erp": "D:/Python development/Fun_Interface/erp_interface.xlsx"
     }
-
     case_path = case_path_dict[qsxq_type]
-    # case_path = "D:/Python development/Fun_Interface/app_interface_test.xlsx"
     data_list = get_excel(case_path)
     run_interface(env, qsxq_type)

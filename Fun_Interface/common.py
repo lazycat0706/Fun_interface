@@ -38,8 +38,18 @@ def send_post_json_request(url, headers, body_data):
     return res.text
 
 
+# 获取登录url
+def get_login_url(qsxq_type):
+    login_url = ""
+    if qsxq_type == "comm":
+        login_url = "http://47.114.138.254:10380/api/v1/login"
+    elif qsxq_type == "erp":
+        login_url = "http://erp-server-test.unicornbpm.com/api/erp/login"
+    return login_url
+
+
 # 获取app请求头（iOS）
-def get_header(qsxq_type):
+def get_headers(qsxq_type, token=""):
     app_headers = {
         "accept-language": "zh-Hans-CN;q=1",
         "x-forwarded-for": "113.116.5.96",
@@ -54,11 +64,24 @@ def get_header(qsxq_type):
         "appid": "f5cd51ef183ef0f5c93a79265a52a353",
         "user-agent": "qu shi xing qiu/0.4.0 (iPhone; iOS 14.2; Scale/3.00)",
     }
+    comm_headers = {
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "zh-CN, zh; q=0.9",
+        "Authorization": token,
+        "Connection": "keep-alive",
+        "Content-Length": "381",
+        "Content-Type": "application/json",
+        "Host": "47.114.138.254:10380",
+        "Origin": "http://47.114.138.254:10281",
+        "Referer": "http://47.114.138.254:10281/",
+        "User-Agent": "Mozilla/5.0(Windows NT 10.0; Win64; x64) AppleWebKit/537.36(KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36"
+    }
     erp_headers = {
         "accept": "application/json, text/plain, */*",
         "Accept - Encoding": "gzip, deflate",
-        "Accept - Language": "zh - CN, zh; q = 0.9",
-        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2MTIyNDM5MzEsIm5iZiI6MTYxMjI0MzkzMSwiZXhwIjoxNjEyODQ4NzMxLCJkYXRhIjp7InVzZXJfbmFtZSI6ImFkbWluX3Rlc3QiLCJ1c2VyX3Bob25lIjoiMTg2ODg0MjM3MzUiLCJ1c2VyX2lkIjoxMDA3MCwic3RhdHVzIjoxfX0.UVaDcHHPe_aaznnAhm8L9HpZAXQmvdRs2KNXWwHaNeE",
+        "Accept - Language": "zh-CN, zh; q=0.9",
+        "Authorization": token,
         "Connection": "keep-alive",
         "Host": "erp-server-test.unicornbpm.com",
         "Origin": "http://47.115.5.180:10281",
@@ -67,8 +90,48 @@ def get_header(qsxq_type):
     }
     if qsxq_type == "app":
         return app_headers
+    elif qsxq_type == "comm":
+        return comm_headers
     elif qsxq_type == "erp":
         return erp_headers
+
+
+# 获取登录post_body数据
+def get_login_data(login_key, qsxq_type):
+    comm_login_data = {
+        "user_phone": "18611112222",
+        "user_password": "12345678",
+        "captcha": "captcha_code",
+        "key": login_key,
+    }
+    erp_login_data = {
+        "user_phone": "18688423735",
+
+        "user_password": "12345678",
+        "captcha": "captcha_code",
+        "key": login_key,
+    }
+    if qsxq_type == "comm":
+        return comm_login_data
+    if qsxq_type == "erp":
+        return erp_login_data
+
+
+# 获取ERP、运营中心的headers中的KEY，及返回的token
+def get_login_token(qsxq_type):
+    key_url = "http://47.114.138.254:10380/api/v1/captcha"
+    key_response = json.loads(requests.get(key_url).text)
+    login_key = key_response["data"]["key"]
+    login_url = get_login_url(qsxq_type)
+    login_headers = get_headers(qsxq_type)
+    login_data = get_login_data(login_key, qsxq_type)
+    login_response = json.loads(requests.post(url=login_url, headers=login_headers, json=login_data).text)
+    token = login_response.get("data").get("access_token")
+    token = "Bearer " + token
+    print(token)
+    return token
+
+
 
 
 # 读取Excel数据
@@ -155,6 +218,9 @@ def connect_db(sql, ex_type="query"):
         conn.commit()
         return ex_result
     conn.close()
+
+
+
 
 
 
