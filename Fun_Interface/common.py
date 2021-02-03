@@ -18,11 +18,16 @@ def get_env_url(env, qsxq_type):
         if env == "sit":
             base_url = "http://erp-server-test.unicornbpm.com/"
             return base_url
+    elif qsxq_type == "applet":
+        if env == "sit":
+            base_url = "https://wx-server-test.unicornbpm.com/"
+            return base_url
 
 
 # 发送get请求
 def send_get_request(url, headers, body_data):
     res = requests.get(url=url, headers=headers, params=body_data)
+    # print(res.text)
     return res.text
 
 
@@ -64,6 +69,10 @@ def get_headers(qsxq_type, token=""):
         "appid": "f5cd51ef183ef0f5c93a79265a52a353",
         "user-agent": "qu shi xing qiu/0.4.0 (iPhone; iOS 14.2; Scale/3.00)",
     }
+    applet_headers = {
+        "userid": "57ef183771d9ac56905d706c0e185e0e",
+        "appid": "wxd30c7522dd4574b8683e7fdc75d17a"
+    }
     comm_headers = {
         "Accept": "application/json, text/plain, */*",
         "Accept-Encoding": "gzip, deflate",
@@ -90,6 +99,8 @@ def get_headers(qsxq_type, token=""):
     }
     if qsxq_type == "app":
         return app_headers
+    elif qsxq_type == "applet":
+        return applet_headers
     elif qsxq_type == "comm":
         return comm_headers
     elif qsxq_type == "erp":
@@ -130,8 +141,6 @@ def get_login_token(qsxq_type):
     token = "Bearer " + token
     print(token)
     return token
-
-
 
 
 # 读取Excel数据

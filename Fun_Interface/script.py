@@ -39,22 +39,23 @@ def run_interface(env, qsxq_type):
                 post_data = json.loads(post_data)
             else:
                 post_data = ""
-            if method == "get":
+            if method.lower() == "get":
                 response = json.loads(send_get_request(url, headers, post_data))
                 check_save(loc_num, api_name, expect_result, response)
                 loc_num += 1
-            elif method == "post":
+            elif method.lower() == "post":
                 response = json.loads(send_post_params_request(url, headers, post_data))
                 check_save(loc_num, api_name, expect_result, response)
                 loc_num += 1
 
 
 if __name__ == '__main__':
-    qsxq_type = "erp"
+    qsxq_type = "applet"
     env = "sit"
     case_path_dict = {
         "app": "D:/Python development/Fun_Interface/app_interface.xlsx",
-        "erp": "D:/Python development/Fun_Interface/erp_interface.xlsx"
+        "erp": "D:/Python development/Fun_Interface/erp_interface.xlsx",
+        "applet": "D:/Python development/Fun_Interface/applet_interface.xlsx"
     }
     case_path = case_path_dict[qsxq_type]
     data_list = get_excel(case_path)
