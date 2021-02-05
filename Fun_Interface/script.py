@@ -1,8 +1,8 @@
 from Fun_Interface.common import *
 import json
-import threading
 
 
+# 接口运行主函数
 def run_interface(env, qsxq_type, case_path):
     token = ""
     if qsxq_type == "comm" or qsxq_type == "erp":
@@ -44,8 +44,11 @@ def run_interface(env, qsxq_type, case_path):
 
 
 if __name__ == '__main__':
+    # 项目
     qsxq_type = "app"
+    # 环境
     env = "sit"
+    # 用例路径
     case_path_dict = {
         "app": "D:/Python development/Fun_Interface/app_interface.xlsx",
         "erp": "D:/Python development/Fun_Interface/erp_interface.xlsx",
@@ -59,6 +62,7 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
     finally:
+        # 发送邮件函数
         ret = send_email(case_path)
         if ret:
             print("邮件发送成功")

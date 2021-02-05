@@ -173,6 +173,7 @@ def get_excel(case_path):
 # 获取各种时间
 def get_time():
     timestamp = time.time()
+    return timestamp
 
 
 # 判断预期结果，并将错误的结果写入Excel中
@@ -253,12 +254,12 @@ def connect_db(sql, ex_type="query"):
     conn.close()
 
 
-
+# 发送邮件
+# noinspection PyTypeChecker
 def send_email(case_path):
     """发送邮件"""
-
-    #读取excel数据
-    data = pd.read_excel(case_path, sheet_name="Sheet3",usecols=["收件人", "抄送人", "附件"], nrows=8).fillna(0)
+    # 读取excel数据
+    data = pd.read_excel(case_path, sheet_name="Sheet3", usecols=["收件人", "抄送人", "附件"], nrows=8).fillna(0)
     receiver = list(set(data.get("收件人").values))
     cc = list(set(data.get("抄送人").values))
     files = list(set(data.get("附件").values))
@@ -268,12 +269,10 @@ def send_email(case_path):
         cc.remove(0)
     if 0 in files:
         files.remove(0)
-    # print(receiver, cc, files)
-
     # 基本信息
     my_sender = '542493741@qq.com'  # 发件人邮箱账号
     my_pass = 'uwvinkqvhwbibeeg'  # 发件人邮箱密码
-    path = "D:/Python development/Fun_Interface/"  # 附件路径
+    path = "D:/Python development/Fun_Interface"  # 附件路径
 
     message = MIMEMultipart()
     message['From'] = formataddr(["测试小组", my_sender])
@@ -301,43 +300,7 @@ def send_email(case_path):
         server.sendmail(my_sender, receiver + cc, message.as_string())
         server.quit()
         return True
-    except Exception:
-        traceback.print_exc()
+    except Exception as e:
+        # traceback.print_exc()
+        print(e)
         return False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
